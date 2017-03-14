@@ -64,7 +64,7 @@
 	\begin{align}
 	z_{t}&=\sigma_{g}(W_{z}x_{t}+U_{z}h_{t-1})\\
 	r_{t}&=\sigma_{g}(W_{r}x_{t}+U_{r}h_{t-1})\\
-	\tilde{h}_{t}&=\tanh(Wx_{t}+r_{t}\circ Uh_{t-1})\\
+	\tilde{h}_{t}&=\tanh(Wx_{t}+U(r_{t}\circ h_{t-1}))\\
 	h_{t}&=(1-z_{t})\circ \tilde{h}_{t}+z_{t}\circ h_{t-1}
 	\end{align}	
 где $x_{t}$ -- t-ый элемент последовательности, а $h_{t}$ -- внутреннее состояние сети в t-ый момент времени (после обработки $x_{t}$).

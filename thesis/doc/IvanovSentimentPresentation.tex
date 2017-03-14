@@ -100,9 +100,10 @@
 	\begin{align}
 	z_{t}&=\sigma_{g}(W_{z}x_{t}+U_{z}h_{t-1})\\
 	r_{t}&=\sigma_{g}(W_{r}x_{t}+U_{r}h_{t-1})\\
-	\tilde{h}_{t}&=\tanh(Wx_{t}+r_{t}\circ Uh_{t-1})\\
+	\tilde{h}_{t}&=\tanh(Wx_{t}+U(r_{t}\circ h_{t-1}))\\
 	h_{t}&=(1-z_{t})\circ \tilde{h}_{t}+z_{t}\circ h_{t-1}
 	\end{align}	
+% LSTM
 %		f_{t}&=\sigma_{g}(W_{f}x_{t}+U_{f}h_{t-1}+b_{f})\\
 %	i_{t}&=\sigma_{g}(W_{i}x_{t}+U_{i}h_{t-1}+b_{i})\\
 %	o_{t}&=\sigma_{g}(W_{o}x_{t}+U_{o}h_{t-1}+b_{o})\\
