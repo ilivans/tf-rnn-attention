@@ -11,7 +11,6 @@ from keras.datasets import imdb
 from attention import attention
 from utils import *
 
-tf.reset_default_graph()
 
 # Load the dataset
 (X_train, y_train), (X_test, y_test) = imdb.load_data()
