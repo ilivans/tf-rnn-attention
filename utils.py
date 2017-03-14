@@ -33,3 +33,41 @@ def batch_generator(X, y, batch_size):
             X_copy = X_copy[indices]
             y_copy = y_copy[indices]
             continue
+
+# Metrics
+
+
+def f_macro(y_true, y_pred):
+    labels = (0, 2)  # negative and positive classes' indices
+    f = 0
+    for label in labels:
+        tp = (y_true[:, label] + y_pred[:, label] == 2).sum()
+        fp = (y_true[:, label] - y_pred[:, label] == -1).sum()
+        fn = (y_true[:, label] - y_pred[:, label] == 1).sum()
+        precision = float(tp) / (tp + fp) if tp + fp != 0 else 0
+        recall = float(tp) / (tp + fn) if tp + fn != 0 else 0
+        f_local = 2 * precision * recall / (precision + recall) if precision + recall != 0 else 0
+        f += f_local / len(labels)
+    return f
+
+
+def f_micro(y_true, y_pred):
+    labels = (0, 2)  # negative and positive classes' indices
+    f = 0
+    tp, fp, fn = 0, 0, 0
+    for label in labels:
+        tp += (y_true[:, label] + y_pred[:, label] == 2).sum()
+        fp += (y_true[:, label] - y_pred[:, label] == -1).sum()
+        fn += (y_true[:, label] - y_pred[:, label] == 1).sum()
+    precision = float(tp) / (tp + fp) if tp + fp != 0 else 0
+    recall = float(tp) / (tp + fn) if tp + fn != 0 else 0
+    f = 2 * precision * recall / (precision + recall) if precision + recall != 0 else 0
+    return f
+
+
+if __name__ == "__main__":
+    # Test batch generator
+    gen = batch_generator(np.array(['a', 'b', 'c', 'd']), np.array([1, 2, 3, 4]), 2)
+    for _ in range(8):
+        xx, yy = gen.next()
+        print xx, yy
