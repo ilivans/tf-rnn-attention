@@ -3,6 +3,7 @@ Toy example of attention layer use.
 
 Train RNN (GRU) on IMDB dataset (binary classification).
 """
+from __future__ import print_function
 import tensorflow as tf
 from tensorflow.python.ops.rnn import dynamic_rnn as rnn
 from tensorflow.python.ops.rnn_cell import GRUCell
@@ -33,7 +34,7 @@ embed_dim = 100
 embeddings_var = tf.Variable(tf.random_uniform([vocabulary_size, embed_dim], -1.0, 1.0), trainable=True)
 batch_embedded = tf.nn.embedding_lookup(embeddings_var, batch_ph)
 
-# Bi-RNN layers
+# (Bi-)RNN layer(-s)
 hidden_size = 150
 # birnn_outputs, _ = bi_rnn(GRUCell(hidden_size), GRUCell(hidden_size),
 #                           inputs=batch_embedded, sequence_length=seq_len_ph, dtype=tf.float32)
@@ -73,14 +74,14 @@ num_epochs = 10
 delta = 0.5
 with tf.Session() as sess:
     sess.run(tf.initialize_all_variables())
-    print "Start learning..."
+    print("Start learning...")
     for epoch in range(num_epochs):
         loss_train = 0
         loss_test = 0
         accuracy_train = 0
         accuracy_test = 0
 
-        print "epoch: {}".format(epoch)
+        print("epoch: {}".format(epoch))
 
         # Training
         num_batches = X_train.shape[0] / batch_size
@@ -105,5 +106,5 @@ with tf.Session() as sess:
         accuracy_test /= num_batches
         loss_test /= num_batches
 
-        print "\t train\tloss: {:.3f}\t acc: {:.3f}".format(loss_train, accuracy_train)
-        print "\t test\tloss: {:.3f}\t acc: {:.3f}".format(loss_test, accuracy_test)
+        print("\t train\tloss: {:.3f}\t acc: {:.3f}".format(loss_train, accuracy_train))
+        print("\t test\tloss: {:.3f}\t acc: {:.3f}".format(loss_test, accuracy_test))
