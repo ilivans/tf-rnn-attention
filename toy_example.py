@@ -1,3 +1,4 @@
+#!/usr/bin/python
 """
 Toy example of attention layer use.
 
