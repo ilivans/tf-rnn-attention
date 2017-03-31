@@ -66,7 +66,7 @@ accuracy = 1. - tf.reduce_mean(tf.cast(tf.equal(tf.round(y_hat), target_ph), tf.
 seq_len_test = np.array([list(x).index(0) + 1 for x in X_test])
 seq_len_train = np.array([list(x).index(0) + 1 for x in X_train])
 
-# Train batch generator
+# Batch generators
 batch_size = 256
 train_batch_generator = batch_generator(X_train, y_train, batch_size)
 test_batch_generator = batch_generator(X_test, y_test, batch_size)
