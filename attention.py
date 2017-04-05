@@ -11,7 +11,7 @@ def attention(inputs, attention_size):
     """
     # In case of Bi-RNN input we need to concatenate outputs of its forward and backward parts
     if isinstance(inputs, tuple):
-        inputs = tf.concat(2, inputs)
+        inputs = tf.concat(inputs, 2)
 
     sequence_length = inputs.get_shape()[1].value  # the length of sequences processed in the antecedent RNN layer
     hidden_size = inputs.get_shape()[2].value  # hidden size of the RNN layer

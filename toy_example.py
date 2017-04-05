@@ -6,8 +6,9 @@ Train RNN (GRU) on IMDB dataset (binary classification).
 """
 from __future__ import print_function
 import tensorflow as tf
+from tensorflow.contrib.rnn import GRUCell
 from tensorflow.python.ops.rnn import dynamic_rnn as rnn
-from tensorflow.python.ops.rnn_cell import GRUCell
+from tensorflow.python.ops.rnn import bidirectional_dynamic_rnn as bi_rnn
 from keras.datasets import imdb
 
 from attention import attention
@@ -56,7 +57,7 @@ y_hat = tf.nn.xw_plus_b(drop, W, b)
 y_hat = tf.squeeze(y_hat)
 
 # Cross-entropy loss and optimizer initialization
-loss = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(y_hat, target_ph))
+loss = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=y_hat, labels=target_ph))
 optimizer = tf.train.AdamOptimizer(learning_rate=1e-3).minimize(loss)
 
 # Accuracy metric
@@ -74,7 +75,7 @@ test_batch_generator = batch_generator(X_test, y_test, batch_size)
 num_epochs = 10
 delta = 0.5
 with tf.Session() as sess:
-    sess.run(tf.initialize_all_variables())
+    sess.run(tf.global_variables_initializer())
     print("Start learning...")
     for epoch in range(num_epochs):
         loss_train = 0
@@ -82,7 +83,7 @@ with tf.Session() as sess:
         accuracy_train = 0
         accuracy_test = 0
 
-        print("epoch: {}".format(epoch))
+        print("epoch: {}\t".format(epoch), end="")
 
         # Training
         num_batches = X_train.shape[0] / batch_size
@@ -107,5 +108,6 @@ with tf.Session() as sess:
         accuracy_test /= num_batches
         loss_test /= num_batches
 
-        print("\t train\tloss: {:.3f}\t acc: {:.3f}".format(loss_train, accuracy_train))
-        print("\t test\tloss: {:.3f}\t acc: {:.3f}".format(loss_test, accuracy_test))
+        print("loss: {:.3f}, val_loss: {:.3f}, acc: {:.3f}, val_acc: {:.3f}".format(
+            loss_train, loss_test, accuracy_train, accuracy_test
+        ))
