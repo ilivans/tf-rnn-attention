@@ -13,8 +13,9 @@ def attention(inputs, attention_size):
     if isinstance(inputs, tuple):
         inputs = tf.concat(inputs, 2)
 
-    sequence_length = inputs.get_shape()[1].value  # the length of sequences processed in the antecedent RNN layer
-    hidden_size = inputs.get_shape()[2].value  # hidden size of the RNN layer
+    inputs_shape = inputs.get_shape()
+    sequence_length = inputs_shape[1].value  # the length of sequences processed in the antecedent RNN layer
+    hidden_size = inputs_shape[2].value  # hidden size of the RNN layer
 
     # Attention mechanism
     W_omega = tf.Variable(tf.random_normal([hidden_size, attention_size], stddev=0.1))

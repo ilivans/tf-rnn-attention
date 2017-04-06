@@ -9,6 +9,7 @@ import tensorflow as tf
 from tensorflow.contrib.rnn import GRUCell
 from tensorflow.python.ops.rnn import dynamic_rnn as rnn
 from tensorflow.python.ops.rnn import bidirectional_dynamic_rnn as bi_rnn
+from tensorflow.python.ops import array_ops
 from keras.datasets import imdb
 
 from attention import attention
@@ -22,6 +23,8 @@ from utils import *
 vocabulary_size = get_vocabulary_size(X_train)
 X_test = fit_in_vocabulary(X_test, vocabulary_size)
 sequence_length = 250
+X_train = [x[:200] for x in X_train]
+X_test = [x[:200] for x in X_test]
 X_train = zero_pad(X_train, sequence_length)
 X_test = zero_pad(X_test, sequence_length)
 
@@ -38,7 +41,7 @@ batch_embedded = tf.nn.embedding_lookup(embeddings_var, batch_ph)
 
 # (Bi-)RNN layer(-s)
 hidden_size = 150
-# birnn_outputs, _ = bi_rnn(GRUCell(hidden_size), GRUCell(hidden_size),
+# rnn_outputs, _ = bi_rnn(GRUCell(hidden_size), GRUCell(hidden_size),
 #                           inputs=batch_embedded, sequence_length=seq_len_ph, dtype=tf.float32)
 rnn_outputs, _ = rnn(GRUCell(hidden_size), inputs=batch_embedded, sequence_length=seq_len_ph, dtype=tf.float32)
 
