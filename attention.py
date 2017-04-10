@@ -5,8 +5,8 @@ def attention(inputs, attention_size, time_major=False):
     """
     Attention mechanism layer which reduces RNN/Bi-RNN outputs with Attention vector.
 
-    The idea was proposed in the article "Hierarchical Attention Networks for Document Classification":
-    http://www.aclweb.org/anthology/N16-1174.
+    The idea was proposed in the article by Z. Yang et al., "Hierarchical Attention Networks
+     for Document Classification", 2016: http://www.aclweb.org/anthology/N16-1174.
     Args:
         inputs: The Attention inputs.
             Matches outputs of RNN/Bi-RNN layer (not final state):
