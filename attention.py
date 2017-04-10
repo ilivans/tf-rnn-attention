@@ -51,7 +51,7 @@ def attention(inputs, attention_size, time_major=False):
         # (T,B,D) => (B,T,D)
         inputs = tf.array_ops.transpose(inputs, [1, 0, 2])
 
-    inputs_shape = inputs.get_shape()
+    inputs_shape = inputs.shape
     sequence_length = inputs_shape[1].value  # the length of sequences processed in the antecedent RNN layer
     hidden_size = inputs_shape[2].value  # hidden size of the RNN layer
 
