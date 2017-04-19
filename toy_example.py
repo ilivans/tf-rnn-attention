@@ -23,8 +23,6 @@ from utils import *
 vocabulary_size = get_vocabulary_size(X_train)
 X_test = fit_in_vocabulary(X_test, vocabulary_size)
 sequence_length = 250
-X_train = [x[:200] for x in X_train]
-X_test = [x[:200] for x in X_test]
 X_train = zero_pad(X_train, sequence_length)
 X_test = zero_pad(X_test, sequence_length)
 
