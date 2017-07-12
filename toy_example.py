@@ -9,7 +9,6 @@ import tensorflow as tf
 from tensorflow.contrib.rnn import GRUCell
 from tensorflow.python.ops.rnn import dynamic_rnn as rnn
 from tensorflow.python.ops.rnn import bidirectional_dynamic_rnn as bi_rnn
-from tensorflow.python.ops import array_ops
 from keras.datasets import imdb
 
 from attention import attention
@@ -48,7 +47,7 @@ attention_size = 50
 attention_output = attention(rnn_outputs, attention_size)
 
 # Dropout
-keep_prob = 0.5
+keep_prob = 0.8
 drop = tf.nn.dropout(attention_output, keep_prob_ph)
 
 # Fully connected layer
@@ -62,7 +61,7 @@ loss = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=y_hat, labe
 optimizer = tf.train.AdamOptimizer(learning_rate=1e-3).minimize(loss)
 
 # Accuracy metric
-accuracy = 1. - tf.reduce_mean(tf.cast(tf.equal(tf.round(y_hat), target_ph), tf.float32))
+accuracy = tf.reduce_mean(tf.cast(tf.equal(tf.round(tf.sigmoid(y_hat)), target_ph), tf.float32))
 
 # Actual lengths of sequences
 seq_len_test = np.array([list(x).index(0) + 1 for x in X_test])
@@ -73,7 +72,8 @@ batch_size = 256
 train_batch_generator = batch_generator(X_train, y_train, batch_size)
 test_batch_generator = batch_generator(X_test, y_test, batch_size)
 
-num_epochs = 10
+# Model easily overfits without pre-trained words embeddings, that's why train for a few epochs
+num_epochs = 3
 delta = 0.5
 with tf.Session() as sess:
     sess.run(tf.global_variables_initializer())
