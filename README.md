@@ -6,7 +6,4 @@ Tensorflow implementation of attention mechanism for text classification tasks (
 - Tensorflow >= 1.0
 - Keras (IMDB dataset)
 
-Sentiment classification of Russian texts using Bi-RNN with attention mechanism: https://github.com/ilivans/attention-sentiment
-
-There I also used to visualize attention weights (the brighter the color the bigger the weight of the corresponding hidden state):
-![](https://github.com/ilivans/tf-rnn-attention/blob/master/visualization.png)
+My bachelor's thesis on sentiment classification of Russian texts using Bi-RNN with attention mechanism: https://github.com/ilivans/attention-sentiment
