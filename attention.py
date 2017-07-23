@@ -1,7 +1,7 @@
 import tensorflow as tf
 
 
-def attention(inputs, attention_size, time_major=False):
+def attention(inputs, attention_size, time_major=False, return_alphas=False):
     """
     Attention mechanism layer which reduces RNN/Bi-RNN outputs with Attention vector.
 
@@ -35,6 +35,8 @@ def attention(inputs, attention_size, time_major=False):
             transposes at the beginning and end of the RNN calculation.  However,
             most TensorFlow data is batch-major, so by default this function
             accepts input and emits output in batch-major form.
+        return_alphas: Whether to return attention coefficients variable along with layer's output.
+            Used for visualization purpose.
     Returns:
         The Attention output `Tensor`.
         In case of RNN, this will be a `Tensor` shaped:
@@ -68,4 +70,7 @@ def attention(inputs, attention_size, time_major=False):
     # Output of Bi-RNN is reduced with attention vector
     output = tf.reduce_sum(inputs * tf.reshape(alphas, [-1, sequence_length, 1]), 1)
 
-    return output
+    if not return_alphas:
+        return output
+    else:
+        return output, alphas
