@@ -1,6 +1,8 @@
 #!/usr/bin/python
 """
-Example of attention coefficients visualization.
+Example of attention coefficients visualization
+
+Uses saved model, so it should be executed after train.py
 """
 from train import *
 

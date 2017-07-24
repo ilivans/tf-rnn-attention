@@ -1,8 +1,8 @@
 #!/usr/bin/python
 """
-Toy example of attention layer use.
+Toy example of attention layer use
 
-Train RNN (GRU) on IMDB dataset (binary classification).
+Train RNN (GRU) on IMDB dataset (binary classification)
 """
 from __future__ import print_function
 import tensorflow as tf
