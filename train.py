@@ -3,6 +3,7 @@
 Toy example of attention layer use
 
 Train RNN (GRU) on IMDB dataset (binary classification)
+Learning and hyper-parameters were not tuned; script serves as an example 
 """
 from __future__ import print_function, division
 import tensorflow as tf
@@ -95,8 +96,11 @@ if __name__ == "__main__":
             for b in range(num_batches):
                 x_batch, y_batch = next(train_batch_generator)
                 seq_len = np.array([list(x).index(0) + 1 for x in x_batch])  # actual lengths of sequences
-                loss_tr, acc, _ = sess.run([loss, accuracy, optimizer], feed_dict={batch_ph: x_batch, target_ph: y_batch,
-                                                                                   seq_len_ph: seq_len, keep_prob_ph: KEEP_PROB})
+                loss_tr, acc, _ = sess.run([loss, accuracy, optimizer],
+                                           feed_dict={batch_ph: x_batch,
+                                                      target_ph: y_batch,
+                                                      seq_len_ph: seq_len,
+                                                      keep_prob_ph: KEEP_PROB})
                 accuracy_train += acc
                 loss_train = loss_tr * DELTA + loss_train * (1 - DELTA)
             accuracy_train /= num_batches
@@ -106,8 +110,11 @@ if __name__ == "__main__":
             for b in range(num_batches):
                 x_batch, y_batch = next(test_batch_generator)
                 seq_len = np.array([list(x).index(0) + 1 for x in x_batch])  # actual lengths of sequences
-                loss_test_batch, acc = sess.run([loss, accuracy], feed_dict={batch_ph: x_batch, target_ph: y_batch,
-                                                                             seq_len_ph: seq_len, keep_prob_ph: 1.0})
+                loss_test_batch, acc = sess.run([loss, accuracy],
+                                                feed_dict={batch_ph: x_batch,
+                                                           target_ph: y_batch,
+                                                           seq_len_ph: seq_len,
+                                                           keep_prob_ph: 1.0})
                 accuracy_test += acc
                 loss_test += loss_test_batch
             accuracy_test /= num_batches
@@ -117,4 +124,3 @@ if __name__ == "__main__":
                 loss_train, loss_test, accuracy_train, accuracy_test
             ))
         saver.save(sess, "model")
-        # saver.save(sess, 'model')

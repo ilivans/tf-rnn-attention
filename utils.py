@@ -15,6 +15,8 @@ def fit_in_vocabulary(X, voc_size):
 
 
 def batch_generator(X, y, batch_size):
+    """Primitive batch generator 
+    """
     size = X.shape[0]
     X_copy = X.copy()
     y_copy = y.copy()
