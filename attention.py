@@ -7,6 +7,8 @@ def attention(inputs, attention_size, time_major=False, return_alphas=False):
 
     The idea was proposed in the article by Z. Yang et al., "Hierarchical Attention Networks
      for Document Classification", 2016: http://www.aclweb.org/anthology/N16-1174.
+    Variables notation is also inherited from the article
+    
     Args:
         inputs: The Attention inputs.
             Matches outputs of RNN/Bi-RNN layer (not final state):
@@ -53,22 +55,23 @@ def attention(inputs, attention_size, time_major=False, return_alphas=False):
         # (T,B,D) => (B,T,D)
         inputs = tf.array_ops.transpose(inputs, [1, 0, 2])
 
-    inputs_shape = inputs.shape
-    sequence_length = inputs_shape[1].value  # the length of sequences processed in the antecedent RNN layer
-    hidden_size = inputs_shape[2].value  # hidden size of the RNN layer
+    hidden_size = inputs.shape[2].value  # D value - hidden size of the RNN layer
 
-    # Attention mechanism
+    # Trainable parameters
     W_omega = tf.Variable(tf.random_normal([hidden_size, attention_size], stddev=0.1))
     b_omega = tf.Variable(tf.random_normal([attention_size], stddev=0.1))
     u_omega = tf.Variable(tf.random_normal([attention_size], stddev=0.1))
 
-    v = tf.tanh(tf.matmul(tf.reshape(inputs, [-1, hidden_size]), W_omega) + tf.reshape(b_omega, [1, -1]))
-    vu = tf.matmul(v, tf.reshape(u_omega, [-1, 1]))
-    exps = tf.reshape(tf.exp(vu), [-1, sequence_length])
-    alphas = exps / tf.reshape(tf.reduce_sum(exps, 1), [-1, 1])
+    # One fully connected layer with non-linear activation for each of the hidden states;
+    #  the shape of `v` is (B*T,A), where A=attention_size
+    v = tf.tanh(tf.matmul(tf.reshape(inputs, [-1, hidden_size]), W_omega) + tf.expand_dims(b_omega, 0))
+    # For each of the B*T hidden states its vector of size A from `v` is reduced with `u` vector
+    vu = tf.matmul(v, tf.expand_dims(u_omega, -1))   # (B*T, 1) shape
+    vu = tf.reshape(vu, tf.shape(inputs)[:2])        # (B,T) shape
+    alphas = tf.nn.softmax(vu)                       # (B,T) shape also
 
-    # Output of Bi-RNN is reduced with attention vector
-    output = tf.reduce_sum(inputs * tf.reshape(alphas, [-1, sequence_length, 1]), 1)
+    # Output of (Bi-)RNN is reduced with attention vector; the result has (B,D) shape
+    output = tf.reduce_sum(inputs * tf.expand_dims(alphas, -1), 1)
 
     if not return_alphas:
         return output
