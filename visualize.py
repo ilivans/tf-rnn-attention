@@ -26,7 +26,7 @@ word_index[":START:"] = 1
 word_index[":UNK:"] = 2
 index_word = {value:key for key,value in word_index.items()}
 # Represent the sample by words rather than indices
-words = map(index_word.get, x_batch_test[0])
+words = list(map(index_word.get, x_batch_test[0]))
 
 # Save visualization as HTML
 with open("visualization.html", "w") as html_file:

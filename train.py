@@ -4,7 +4,7 @@ Toy example of attention layer use
 
 Train RNN (GRU) on IMDB dataset (binary classification)
 """
-from __future__ import print_function
+from __future__ import print_function, division
 import tensorflow as tf
 from tensorflow.contrib.rnn import GRUCell
 from tensorflow.python.ops.rnn import dynamic_rnn as rnn
@@ -91,9 +91,9 @@ if __name__ == "__main__":
             print("epoch: {}\t".format(epoch), end="")
 
             # Training
-            num_batches = X_train.shape[0] / BATCH_SIZE
+            num_batches = X_train.shape[0] // BATCH_SIZE
             for b in range(num_batches):
-                x_batch, y_batch = train_batch_generator.next()
+                x_batch, y_batch = next(train_batch_generator)
                 seq_len = np.array([list(x).index(0) + 1 for x in x_batch])  # actual lengths of sequences
                 loss_tr, acc, _ = sess.run([loss, accuracy, optimizer], feed_dict={batch_ph: x_batch, target_ph: y_batch,
                                                                                    seq_len_ph: seq_len, keep_prob_ph: KEEP_PROB})
@@ -102,9 +102,9 @@ if __name__ == "__main__":
             accuracy_train /= num_batches
 
             # Testing
-            num_batches = X_test.shape[0] / BATCH_SIZE
+            num_batches = X_test.shape[0] // BATCH_SIZE
             for b in range(num_batches):
-                x_batch, y_batch = test_batch_generator.next()
+                x_batch, y_batch = next(test_batch_generator)
                 seq_len = np.array([list(x).index(0) + 1 for x in x_batch])  # actual lengths of sequences
                 loss_test_batch, acc = sess.run([loss, accuracy], feed_dict={batch_ph: x_batch, target_ph: y_batch,
                                                                              seq_len_ph: seq_len, keep_prob_ph: 1.0})
