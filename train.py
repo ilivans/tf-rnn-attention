@@ -6,6 +6,7 @@ Train RNN (GRU) on IMDB dataset (binary classification)
 Learning and hyper-parameters were not tuned; script serves as an example 
 """
 from __future__ import print_function, division
+
 import tensorflow as tf
 from tensorflow.contrib.rnn import GRUCell
 from tensorflow.python.ops.rnn import dynamic_rnn as rnn
@@ -57,7 +58,7 @@ attention_output, alphas = attention(rnn_outputs, ATTENTION_SIZE, return_alphas=
 drop = tf.nn.dropout(attention_output, keep_prob_ph)
 
 # Fully connected layer
-W = tf.Variable(tf.truncated_normal([drop.get_shape()[1].value, 1], stddev=0.1))
+W = tf.Variable(tf.truncated_normal([HIDDEN_SIZE * 2, 1], stddev=0.1))  # Hidden size is multiplied by 2 for Bi-RNN
 b = tf.Variable(tf.constant(0., shape=[1]))
 y_hat = tf.nn.xw_plus_b(drop, W, b)
 y_hat = tf.squeeze(y_hat)
