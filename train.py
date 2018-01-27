@@ -152,7 +152,7 @@ if __name__ == "__main__":
                 print("loss: {:.3f}, val_loss: {:.3f}, acc: {:.3f}, val_acc: {:.3f}".format(
                     loss_train, loss_test, accuracy_train, accuracy_test
                 ))
-		saver.save(sess, "trained.model")
+                saver.save(sess, "trained.model")
         train_writer.close()
         test_writer.close()
         saver.save(sess, "trained.model")
