@@ -10,7 +10,7 @@ saver = tf.train.import_meta_graph('model.meta')
 
 # Calculate alpha coefficients for the first test example
 with tf.Session() as sess:
-    saver.restore(sess, "model")
+    saver.restore(sess, "trained.model")
 
     x_batch_test, y_batch_test = X_test[:1], y_test[:1]
     seq_len_test = np.array([list(x).index(0) + 1 for x in x_batch_test])
