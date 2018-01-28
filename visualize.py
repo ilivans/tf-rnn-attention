@@ -6,7 +6,7 @@ Uses saved model, so it should be executed after train.py
 """
 from train import *
 
-saver = tf.train.import_meta_graph('./model.meta')
+saver = tf.train.Saver()
 
 # Calculate alpha coefficients for the first test example
 with tf.Session() as sess:
