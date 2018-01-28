@@ -89,5 +89,4 @@ ENV/
 .ropeproject
 
 # Tensorboard logs
-.LENOVO-YOGA2PRO
 logdir/

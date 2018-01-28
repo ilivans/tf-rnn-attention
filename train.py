@@ -8,6 +8,7 @@ Learning and hyper-parameters were not tuned; script serves as an example
 from __future__ import print_function, division
 
 import tensorflow as tf
+import numpy as np
 from tensorflow.contrib.rnn import GRUCell
 from tensorflow.python.ops.rnn import dynamic_rnn as rnn
 from tensorflow.python.ops.rnn import bidirectional_dynamic_rnn as bi_rnn
@@ -43,34 +44,31 @@ target_ph = tf.placeholder(tf.float32, [None],name='target_ph')
 seq_len_ph = tf.placeholder(tf.int32, [None],name='seq_len_ph')
 keep_prob_ph = tf.placeholder(tf.float32,name='keep_prob_ph')
 
-with tf.name_scope('Encoder'):
-    # Embedding layer
-    with tf.name_scope('Embedding_layer'):
-        embeddings_var = tf.Variable(tf.random_uniform([vocabulary_size, EMBEDDING_DIM], -1.0, 1.0), trainable=True)
-        batch_embedded = tf.nn.embedding_lookup(embeddings_var, batch_ph)
-    
-    # (Bi-)RNN layer(-s)
-    with tf.name_scope('BiRNN_layer'):
-        rnn_outputs, _ = bi_rnn(GRUCell(HIDDEN_SIZE), GRUCell(HIDDEN_SIZE),
-                                inputs=batch_embedded, sequence_length=seq_len_ph, dtype=tf.float32)
-        # rnn_outputs, _ = rnn(GRUCell(hidden_size), inputs=batch_embedded, sequence_length=seq_len_ph, dtype=tf.float32)
+# Embedding layer
+with tf.name_scope('Embedding_layer'):
+    embeddings_var = tf.Variable(tf.random_uniform([vocabulary_size, EMBEDDING_DIM], -1.0, 1.0), trainable=True)
+    batch_embedded = tf.nn.embedding_lookup(embeddings_var, batch_ph)
+
+# (Bi-)RNN layer(-s)
+with tf.name_scope('BiRNN_layer'):
+    rnn_outputs, _ = bi_rnn(GRUCell(HIDDEN_SIZE), GRUCell(HIDDEN_SIZE),
+                            inputs=batch_embedded, sequence_length=seq_len_ph, dtype=tf.float32)
+    # rnn_outputs, _ = rnn(GRUCell(hidden_size), inputs=batch_embedded, sequence_length=seq_len_ph, dtype=tf.float32)
 
 # Attention layer
 with tf.name_scope('Attention_layer'):
     attention_output, alphas = attention(rnn_outputs, ATTENTION_SIZE, return_alphas=True)
 
-
-with tf.name_scope('Decoder'):
-    # Dropout
-    with tf.name_scope('Dropout'):
-        drop = tf.nn.dropout(attention_output, keep_prob_ph)
-        
-    # Fully connected layer
-    with tf.name_scope('Fully_connected_layer'):
-        W = tf.Variable(tf.truncated_normal([HIDDEN_SIZE * 2, 1], stddev=0.1))  # Hidden size is multiplied by 2 for Bi-RNN
-        b = tf.Variable(tf.constant(0., shape=[1]))
-        y_hat = tf.nn.xw_plus_b(drop, W, b)
-        y_hat = tf.squeeze(y_hat)
+# Dropout
+with tf.name_scope('Dropout'):
+    drop = tf.nn.dropout(attention_output, keep_prob_ph)
+    
+# Fully connected layer
+with tf.name_scope('Fully_connected_layer'):
+    W = tf.Variable(tf.truncated_normal([HIDDEN_SIZE * 2, 1], stddev=0.1))  # Hidden size is multiplied by 2 for Bi-RNN
+    b = tf.Variable(tf.constant(0., shape=[1]))
+    y_hat = tf.nn.xw_plus_b(drop, W, b)
+    y_hat = tf.squeeze(y_hat)
 
 with tf.name_scope('Mertrics'):
     # Cross-entropy loss and optimizer initialization
@@ -95,7 +93,6 @@ test_batch_generator = batch_generator(X_test, y_test, BATCH_SIZE)
 train_writer = tf.summary.FileWriter('./logdir/train',accuracy.graph)
 test_writer = tf.summary.FileWriter( './logdir/test',accuracy.graph)
     
-
 session_conf = tf.ConfigProto(
     gpu_options=tf.GPUOptions(
         allow_growth=True,
@@ -114,31 +111,32 @@ if __name__ == "__main__":
             accuracy_train = 0
             accuracy_test = 0
 
-            print("epoch: {}\t".format(epoch), end="")
+            print("Training epoch: {}\t".format(epoch), end="")
 
             # Training
             num_batches = X_train.shape[0] // BATCH_SIZE
             for b in tqdm(range(num_batches)):
-                x_batch, y_batch = next(train_batch_generator)
-                seq_len = np.array([list(x).index(0) + 1 for x in x_batch])  # actual lengths of sequences
-                loss_tr, acc, _ ,summary= sess.run([loss, accuracy, optimizer,merged],
-                                           feed_dict={batch_ph: x_batch,
-                                                      target_ph: y_batch,
-                                                      seq_len_ph: seq_len,
-                                                      keep_prob_ph: KEEP_PROB})
-                accuracy_train += acc
-                loss_train = loss_tr * DELTA + loss_train * (1 - DELTA)
-                train_writer.add_summary(summary, b)
-            accuracy_train /= num_batches
+                if b == 1:
+                    x_batch, y_batch = next(train_batch_generator)
+                    seq_len = np.array([list(x).index(0) + 1 for x in x_batch])  # actual lengths of sequences
+                    loss_tr, acc, _ ,summary= sess.run([loss, accuracy, optimizer, merged],
+                                               feed_dict={batch_ph: x_batch,
+                                                          target_ph: y_batch,
+                                                          seq_len_ph: seq_len,
+                                                          keep_prob_ph: KEEP_PROB})
+                    accuracy_train += acc
+                    loss_train = loss_tr * DELTA + loss_train * (1 - DELTA)
+                    train_writer.add_summary(summary, b)
+                    accuracy_train /= num_batches
 
             # Testing
-            if epoch%10 == 0:
-                print ("Testing")
-                num_batches = X_test.shape[0] // BATCH_SIZE
-                for b in tqdm(range(num_batches)):
+            num_batches = X_test.shape[0] // BATCH_SIZE
+            print("Testing\n")
+            for b in tqdm(range(num_batches)):
+                if b == 1:
                     x_batch, y_batch = next(test_batch_generator)
                     seq_len = np.array([list(x).index(0) + 1 for x in x_batch])  # actual lengths of sequences
-                    loss_test_batch, acc,summary = sess.run([loss, accuracy,merged],
+                    loss_test_batch, acc,summary = sess.run([loss, accuracy, merged],
                                                     feed_dict={batch_ph: x_batch,
                                                                target_ph: y_batch,
                                                                seq_len_ph: seq_len,
@@ -149,10 +147,9 @@ if __name__ == "__main__":
                 accuracy_test /= num_batches
                 loss_test /= num_batches
     
-                print("loss: {:.3f}, val_loss: {:.3f}, acc: {:.3f}, val_acc: {:.3f}".format(
-                    loss_train, loss_test, accuracy_train, accuracy_test
-                ))
-                saver.save(sess, "trained.model")
+            print("loss: {:.3f}, val_loss: {:.3f}, acc: {:.3f}, val_acc: {:.3f}".format(
+                loss_train, loss_test, accuracy_train, accuracy_test
+            ))
         train_writer.close()
         test_writer.close()
-        saver.save(sess, "trained.model")
+        saver.save(sess, "./model")
