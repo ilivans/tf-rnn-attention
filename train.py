@@ -147,9 +147,9 @@ if __name__ == "__main__":
                 accuracy_test /= num_batches
                 loss_test /= num_batches
     
-                print("loss: {:.3f}, val_loss: {:.3f}, acc: {:.3f}, val_acc: {:.3f}".format(
-                    loss_train, loss_test, accuracy_train, accuracy_test
-                ))
+            print("loss: {:.3f}, val_loss: {:.3f}, acc: {:.3f}, val_acc: {:.3f}".format(
+                loss_train, loss_test, accuracy_train, accuracy_test
+            ))
         train_writer.close()
         test_writer.close()
         saver.save(sess, "./model")
