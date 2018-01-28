@@ -44,34 +44,31 @@ target_ph = tf.placeholder(tf.float32, [None],name='target_ph')
 seq_len_ph = tf.placeholder(tf.int32, [None],name='seq_len_ph')
 keep_prob_ph = tf.placeholder(tf.float32,name='keep_prob_ph')
 
-with tf.name_scope('Encoder'):
-    # Embedding layer
-    with tf.name_scope('Embedding_layer'):
-        embeddings_var = tf.Variable(tf.random_uniform([vocabulary_size, EMBEDDING_DIM], -1.0, 1.0), trainable=True)
-        batch_embedded = tf.nn.embedding_lookup(embeddings_var, batch_ph)
-    
-    # (Bi-)RNN layer(-s)
-    with tf.name_scope('BiRNN_layer'):
-        rnn_outputs, _ = bi_rnn(GRUCell(HIDDEN_SIZE), GRUCell(HIDDEN_SIZE),
-                                inputs=batch_embedded, sequence_length=seq_len_ph, dtype=tf.float32)
-        # rnn_outputs, _ = rnn(GRUCell(hidden_size), inputs=batch_embedded, sequence_length=seq_len_ph, dtype=tf.float32)
+# Embedding layer
+with tf.name_scope('Embedding_layer'):
+    embeddings_var = tf.Variable(tf.random_uniform([vocabulary_size, EMBEDDING_DIM], -1.0, 1.0), trainable=True)
+    batch_embedded = tf.nn.embedding_lookup(embeddings_var, batch_ph)
+
+# (Bi-)RNN layer(-s)
+with tf.name_scope('BiRNN_layer'):
+    rnn_outputs, _ = bi_rnn(GRUCell(HIDDEN_SIZE), GRUCell(HIDDEN_SIZE),
+                            inputs=batch_embedded, sequence_length=seq_len_ph, dtype=tf.float32)
+    # rnn_outputs, _ = rnn(GRUCell(hidden_size), inputs=batch_embedded, sequence_length=seq_len_ph, dtype=tf.float32)
 
 # Attention layer
 with tf.name_scope('Attention_layer'):
     attention_output, alphas = attention(rnn_outputs, ATTENTION_SIZE, return_alphas=True)
 
-
-with tf.name_scope('Decoder'):
-    # Dropout
-    with tf.name_scope('Dropout'):
-        drop = tf.nn.dropout(attention_output, keep_prob_ph)
-        
-    # Fully connected layer
-    with tf.name_scope('Fully_connected_layer'):
-        W = tf.Variable(tf.truncated_normal([HIDDEN_SIZE * 2, 1], stddev=0.1))  # Hidden size is multiplied by 2 for Bi-RNN
-        b = tf.Variable(tf.constant(0., shape=[1]))
-        y_hat = tf.nn.xw_plus_b(drop, W, b)
-        y_hat = tf.squeeze(y_hat)
+# Dropout
+with tf.name_scope('Dropout'):
+    drop = tf.nn.dropout(attention_output, keep_prob_ph)
+    
+# Fully connected layer
+with tf.name_scope('Fully_connected_layer'):
+    W = tf.Variable(tf.truncated_normal([HIDDEN_SIZE * 2, 1], stddev=0.1))  # Hidden size is multiplied by 2 for Bi-RNN
+    b = tf.Variable(tf.constant(0., shape=[1]))
+    y_hat = tf.nn.xw_plus_b(drop, W, b)
+    y_hat = tf.squeeze(y_hat)
 
 with tf.name_scope('Mertrics'):
     # Cross-entropy loss and optimizer initialization
@@ -96,7 +93,6 @@ test_batch_generator = batch_generator(X_test, y_test, BATCH_SIZE)
 train_writer = tf.summary.FileWriter('./logdir/train',accuracy.graph)
 test_writer = tf.summary.FileWriter( './logdir/test',accuracy.graph)
     
-
 session_conf = tf.ConfigProto(
     gpu_options=tf.GPUOptions(
         allow_growth=True,
