@@ -8,6 +8,7 @@ Learning and hyper-parameters were not tuned; script serves as an example
 from __future__ import print_function, division
 
 import tensorflow as tf
+import numpy as np
 from tensorflow.contrib.rnn import GRUCell
 from tensorflow.python.ops.rnn import dynamic_rnn as rnn
 from tensorflow.python.ops.rnn import bidirectional_dynamic_rnn as bi_rnn
@@ -114,31 +115,32 @@ if __name__ == "__main__":
             accuracy_train = 0
             accuracy_test = 0
 
-            print("epoch: {}\t".format(epoch), end="")
+            print("Training epoch: {}\t".format(epoch), end="")
 
             # Training
             num_batches = X_train.shape[0] // BATCH_SIZE
             for b in tqdm(range(num_batches)):
-                x_batch, y_batch = next(train_batch_generator)
-                seq_len = np.array([list(x).index(0) + 1 for x in x_batch])  # actual lengths of sequences
-                loss_tr, acc, _ ,summary= sess.run([loss, accuracy, optimizer,merged],
-                                           feed_dict={batch_ph: x_batch,
-                                                      target_ph: y_batch,
-                                                      seq_len_ph: seq_len,
-                                                      keep_prob_ph: KEEP_PROB})
-                accuracy_train += acc
-                loss_train = loss_tr * DELTA + loss_train * (1 - DELTA)
-                train_writer.add_summary(summary, b)
-            accuracy_train /= num_batches
+                if b == 1:
+                    x_batch, y_batch = next(train_batch_generator)
+                    seq_len = np.array([list(x).index(0) + 1 for x in x_batch])  # actual lengths of sequences
+                    loss_tr, acc, _ ,summary= sess.run([loss, accuracy, optimizer, merged],
+                                               feed_dict={batch_ph: x_batch,
+                                                          target_ph: y_batch,
+                                                          seq_len_ph: seq_len,
+                                                          keep_prob_ph: KEEP_PROB})
+                    accuracy_train += acc
+                    loss_train = loss_tr * DELTA + loss_train * (1 - DELTA)
+                    train_writer.add_summary(summary, b)
+                    accuracy_train /= num_batches
 
             # Testing
-            if epoch%10 == 0:
-                print ("Testing")
-                num_batches = X_test.shape[0] // BATCH_SIZE
-                for b in tqdm(range(num_batches)):
+            num_batches = X_test.shape[0] // BATCH_SIZE
+            print("Testing\n")
+            for b in tqdm(range(num_batches)):
+                if b == 1:
                     x_batch, y_batch = next(test_batch_generator)
                     seq_len = np.array([list(x).index(0) + 1 for x in x_batch])  # actual lengths of sequences
-                    loss_test_batch, acc,summary = sess.run([loss, accuracy,merged],
+                    loss_test_batch, acc,summary = sess.run([loss, accuracy, merged],
                                                     feed_dict={batch_ph: x_batch,
                                                                target_ph: y_batch,
                                                                seq_len_ph: seq_len,
@@ -152,7 +154,6 @@ if __name__ == "__main__":
                 print("loss: {:.3f}, val_loss: {:.3f}, acc: {:.3f}, val_acc: {:.3f}".format(
                     loss_train, loss_test, accuracy_train, accuracy_test
                 ))
-                saver.save(sess, "trained.model")
         train_writer.close()
         test_writer.close()
-        saver.save(sess, "trained.model")
+        saver.save(sess, "./model")

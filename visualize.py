@@ -6,11 +6,11 @@ Uses saved model, so it should be executed after train.py
 """
 from train import *
 
-saver = tf.train.import_meta_graph('model.meta')
+saver = tf.train.import_meta_graph('./model.meta')
 
 # Calculate alpha coefficients for the first test example
 with tf.Session() as sess:
-    saver.restore(sess, "trained.model")
+    saver.restore(sess, "./model")
 
     x_batch_test, y_batch_test = X_test[:1], y_test[:1]
     seq_len_test = np.array([list(x).index(0) + 1 for x in x_batch_test])
