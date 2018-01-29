@@ -37,4 +37,4 @@ with open("visualization.html", "w") as html_file:
             break
         html_file.write('<font style="background: rgba(255, 255, 0, %f)">%s</font>\n' % (alpha, word))
 
-print("")
+print("Open visualization.html to checkout the attention coefficients visualization.")
