@@ -111,7 +111,7 @@ if __name__ == "__main__":
             accuracy_train = 0
             accuracy_test = 0
 
-            print("Training epoch: {}\t".format(epoch), end="")
+            print("epoch: {}\t".format(epoch), end="")
 
             # Training
             num_batches = X_train.shape[0] // BATCH_SIZE
@@ -126,7 +126,7 @@ if __name__ == "__main__":
                 accuracy_train += acc
                 loss_train = loss_tr * DELTA + loss_train * (1 - DELTA)
                 train_writer.add_summary(summary, b)
-                accuracy_train /= num_batches
+            accuracy_train /= num_batches
 
             # Testing
             num_batches = X_test.shape[0] // BATCH_SIZE
