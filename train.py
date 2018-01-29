@@ -10,13 +10,13 @@ from __future__ import print_function, division
 import tensorflow as tf
 import numpy as np
 from tensorflow.contrib.rnn import GRUCell
-from tensorflow.python.ops.rnn import dynamic_rnn as rnn
 from tensorflow.python.ops.rnn import bidirectional_dynamic_rnn as bi_rnn
 from keras.datasets import imdb
 from tqdm import tqdm
 
 from attention import attention
-from utils import *
+from utils import get_vocabulary_size, fit_in_vocabulary, zero_pad, batch_generator
+
 
 NUM_WORDS = 10000
 INDEX_FROM = 3
@@ -39,10 +39,10 @@ X_train = zero_pad(X_train, SEQUENCE_LENGTH)
 X_test = zero_pad(X_test, SEQUENCE_LENGTH)
 
 # Different placeholders
-batch_ph = tf.placeholder(tf.int32, [None, SEQUENCE_LENGTH],name='batch_ph')
-target_ph = tf.placeholder(tf.float32, [None],name='target_ph')
-seq_len_ph = tf.placeholder(tf.int32, [None],name='seq_len_ph')
-keep_prob_ph = tf.placeholder(tf.float32,name='keep_prob_ph')
+batch_ph = tf.placeholder(tf.int32, [None, SEQUENCE_LENGTH], name='batch_ph')
+target_ph = tf.placeholder(tf.float32, [None], name='target_ph')
+seq_len_ph = tf.placeholder(tf.int32, [None], name='seq_len_ph')
+keep_prob_ph = tf.placeholder(tf.float32, name='keep_prob_ph')
 
 # Embedding layer
 with tf.name_scope('Embedding_layer'):
@@ -70,7 +70,7 @@ with tf.name_scope('Fully_connected_layer'):
     y_hat = tf.nn.xw_plus_b(drop, W, b)
     y_hat = tf.squeeze(y_hat)
 
-with tf.name_scope('Mertrics'):
+with tf.name_scope('Metrics'):
     # Cross-entropy loss and optimizer initialization
     loss = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=y_hat, labels=target_ph))
     tf.summary.scalar('loss', loss)
@@ -90,8 +90,8 @@ merged = tf.summary.merge_all()
 train_batch_generator = batch_generator(X_train, y_train, BATCH_SIZE)
 test_batch_generator = batch_generator(X_test, y_test, BATCH_SIZE)
 
-train_writer = tf.summary.FileWriter('./logdir/train',accuracy.graph)
-test_writer = tf.summary.FileWriter( './logdir/test',accuracy.graph)
+train_writer = tf.summary.FileWriter('./logdir/train', accuracy.graph)
+test_writer = tf.summary.FileWriter( './logdir/test', accuracy.graph)
     
 session_conf = tf.ConfigProto(
     gpu_options=tf.GPUOptions(
@@ -102,7 +102,7 @@ session_conf = tf.ConfigProto(
 saver = tf.train.Saver()
 
 if __name__ == "__main__":
-    with tf.Session(config=session_conf) as sess:
+    with tf.Session(config = session_conf) as sess:
         sess.run(tf.global_variables_initializer())
         print("Start learning...")
         for epoch in range(NUM_EPOCHS):
@@ -111,14 +111,14 @@ if __name__ == "__main__":
             accuracy_train = 0
             accuracy_test = 0
 
-            print("Training epoch: {}\t".format(epoch), end="")
+            print("epoch: {}\t".format(epoch), end="")
 
             # Training
             num_batches = X_train.shape[0] // BATCH_SIZE
             for b in tqdm(range(num_batches)):
                 x_batch, y_batch = next(train_batch_generator)
                 seq_len = np.array([list(x).index(0) + 1 for x in x_batch])  # actual lengths of sequences
-                loss_tr, acc, _ ,summary= sess.run([loss, accuracy, optimizer, merged],
+                loss_tr, acc, _ , summary= sess.run([loss, accuracy, optimizer, merged],
                                                     feed_dict={batch_ph: x_batch,
                                                     target_ph: y_batch,
                                                     seq_len_ph: seq_len,
@@ -126,14 +126,14 @@ if __name__ == "__main__":
                 accuracy_train += acc
                 loss_train = loss_tr * DELTA + loss_train * (1 - DELTA)
                 train_writer.add_summary(summary, b)
-                accuracy_train /= num_batches
+            accuracy_train /= num_batches
 
             # Testing
             num_batches = X_test.shape[0] // BATCH_SIZE
             for b in tqdm(range(num_batches)):
                 x_batch, y_batch = next(test_batch_generator)
                 seq_len = np.array([list(x).index(0) + 1 for x in x_batch])  # actual lengths of sequences
-                loss_test_batch, acc,summary = sess.run([loss, accuracy, merged],
+                loss_test_batch, acc, summary = sess.run([loss, accuracy, merged],
                                                         feed_dict={batch_ph: x_batch,
                                                         target_ph: y_batch,
                                                         seq_len_ph: seq_len,
