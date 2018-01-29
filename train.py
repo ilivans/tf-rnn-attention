@@ -39,24 +39,29 @@ X_train = zero_pad(X_train, SEQUENCE_LENGTH)
 X_test = zero_pad(X_test, SEQUENCE_LENGTH)
 
 # Different placeholders
-batch_ph = tf.placeholder(tf.int32, [None, SEQUENCE_LENGTH], name='batch_ph')
-target_ph = tf.placeholder(tf.float32, [None], name='target_ph')
-seq_len_ph = tf.placeholder(tf.int32, [None], name='seq_len_ph')
-keep_prob_ph = tf.placeholder(tf.float32, name='keep_prob_ph')
+with tf.name_scope('inputs'):
+    batch_ph = tf.placeholder(tf.int32, [None, SEQUENCE_LENGTH], name='batch_ph')
+    target_ph = tf.placeholder(tf.float32, [None], name='target_ph')
+    seq_len_ph = tf.placeholder(tf.int32, [None], name='seq_len_ph')
+    keep_prob_ph = tf.placeholder(tf.float32, name='keep_prob_ph')
 
 # Embedding layer
 with tf.name_scope('Embedding_layer'):
     embeddings_var = tf.Variable(tf.random_uniform([vocabulary_size, EMBEDDING_DIM], -1.0, 1.0), trainable=True)
+    tf.summary.histogram('embeddings_var', embeddings_var)   
     batch_embedded = tf.nn.embedding_lookup(embeddings_var, batch_ph)
 
 # (Bi-)RNN layer(-s)
 rnn_outputs, _ = bi_rnn(GRUCell(HIDDEN_SIZE), GRUCell(HIDDEN_SIZE),
                         inputs=batch_embedded, sequence_length=seq_len_ph, dtype=tf.float32)
+tf.summary.histogram('rnn_outputs', rnn_outputs)   
 # rnn_outputs, _ = rnn(GRUCell(hidden_size), inputs=batch_embedded, sequence_length=seq_len_ph, dtype=tf.float32)
+
 
 # Attention layer
 with tf.name_scope('Attention_layer'):
     attention_output, alphas = attention(rnn_outputs, ATTENTION_SIZE, return_alphas=True)
+    tf.summary.histogram('alphas', alphas)   
 
 # Dropout
 drop = tf.nn.dropout(attention_output, keep_prob_ph)
@@ -67,6 +72,7 @@ with tf.name_scope('Fully_connected_layer'):
     b = tf.Variable(tf.constant(0., shape=[1]))
     y_hat = tf.nn.xw_plus_b(drop, W, b)
     y_hat = tf.squeeze(y_hat)
+    tf.summary.histogram('W', W)   
 
 with tf.name_scope('Metrics'):
     # Cross-entropy loss and optimizer initialization
@@ -147,4 +153,4 @@ if __name__ == "__main__":
             ))
         train_writer.close()
         test_writer.close()
-        saver.save(sess, "./model")
+        saver.save(sess, "./logdir/model")
