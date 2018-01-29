@@ -39,10 +39,10 @@ X_train = zero_pad(X_train, SEQUENCE_LENGTH)
 X_test = zero_pad(X_test, SEQUENCE_LENGTH)
 
 # Different placeholders
-batch_ph = tf.placeholder(tf.int32, [None, SEQUENCE_LENGTH],name='batch_ph')
-target_ph = tf.placeholder(tf.float32, [None],name='target_ph')
-seq_len_ph = tf.placeholder(tf.int32, [None],name='seq_len_ph')
-keep_prob_ph = tf.placeholder(tf.float32,name='keep_prob_ph')
+batch_ph = tf.placeholder(tf.int32, [None, SEQUENCE_LENGTH], name='batch_ph')
+target_ph = tf.placeholder(tf.float32, [None], name='target_ph')
+seq_len_ph = tf.placeholder(tf.int32, [None], name='seq_len_ph')
+keep_prob_ph = tf.placeholder(tf.float32, name='keep_prob_ph')
 
 # Embedding layer
 with tf.name_scope('Embedding_layer'):
@@ -90,8 +90,8 @@ merged = tf.summary.merge_all()
 train_batch_generator = batch_generator(X_train, y_train, BATCH_SIZE)
 test_batch_generator = batch_generator(X_test, y_test, BATCH_SIZE)
 
-train_writer = tf.summary.FileWriter('./logdir/train',accuracy.graph)
-test_writer = tf.summary.FileWriter( './logdir/test',accuracy.graph)
+train_writer = tf.summary.FileWriter('./logdir/train', accuracy.graph)
+test_writer = tf.summary.FileWriter( './logdir/test', accuracy.graph)
     
 session_conf = tf.ConfigProto(
     gpu_options=tf.GPUOptions(
@@ -118,7 +118,7 @@ if __name__ == "__main__":
             for b in tqdm(range(num_batches)):
                 x_batch, y_batch = next(train_batch_generator)
                 seq_len = np.array([list(x).index(0) + 1 for x in x_batch])  # actual lengths of sequences
-                loss_tr, acc, _ ,summary= sess.run([loss, accuracy, optimizer, merged],
+                loss_tr, acc, _ , summary= sess.run([loss, accuracy, optimizer, merged],
                                                     feed_dict={batch_ph: x_batch,
                                                     target_ph: y_batch,
                                                     seq_len_ph: seq_len,
@@ -133,7 +133,7 @@ if __name__ == "__main__":
             for b in tqdm(range(num_batches)):
                 x_batch, y_batch = next(test_batch_generator)
                 seq_len = np.array([list(x).index(0) + 1 for x in x_batch])  # actual lengths of sequences
-                loss_test_batch, acc,summary = sess.run([loss, accuracy, merged],
+                loss_test_batch, acc, summary = sess.run([loss, accuracy, merged],
                                                         feed_dict={batch_ph: x_batch,
                                                         target_ph: y_batch,
                                                         seq_len_ph: seq_len,
