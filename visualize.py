@@ -36,3 +36,5 @@ with open("visualization.html", "w") as html_file:
         elif word == ":PAD:":
             break
         html_file.write('<font style="background: rgba(255, 255, 0, %f)">%s</font>\n' % (alpha, word))
+
+print("")
