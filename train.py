@@ -10,13 +10,13 @@ from __future__ import print_function, division
 import tensorflow as tf
 import numpy as np
 from tensorflow.contrib.rnn import GRUCell
-from tensorflow.python.ops.rnn import dynamic_rnn as rnn
 from tensorflow.python.ops.rnn import bidirectional_dynamic_rnn as bi_rnn
 from keras.datasets import imdb
 from tqdm import tqdm
 
 from attention import attention
-from utils import *
+from utils import get_vocabulary_size, fit_in_vocabulary, zero_pad, batch_generator
+
 
 NUM_WORDS = 10000
 INDEX_FROM = 3
@@ -102,7 +102,7 @@ session_conf = tf.ConfigProto(
 saver = tf.train.Saver()
 
 if __name__ == "__main__":
-    with tf.Session(config=session_conf) as sess:
+    with tf.Session(config = session_conf) as sess:
         sess.run(tf.global_variables_initializer())
         print("Start learning...")
         for epoch in range(NUM_EPOCHS):
