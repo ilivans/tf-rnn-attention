@@ -154,3 +154,4 @@ if __name__ == "__main__":
         train_writer.close()
         test_writer.close()
         saver.save(sess, "./logdir/model")
+        print("Run 'tensorboard --logdir=./logdir' to checkout tensorboard logs.")
