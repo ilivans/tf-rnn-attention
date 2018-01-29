@@ -70,7 +70,7 @@ with tf.name_scope('Fully_connected_layer'):
     y_hat = tf.nn.xw_plus_b(drop, W, b)
     y_hat = tf.squeeze(y_hat)
 
-with tf.name_scope('Mertrics'):
+with tf.name_scope('Metrics'):
     # Cross-entropy loss and optimizer initialization
     loss = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=y_hat, labels=target_ph))
     tf.summary.scalar('loss', loss)
