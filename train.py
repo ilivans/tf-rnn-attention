@@ -50,18 +50,16 @@ with tf.name_scope('Embedding_layer'):
     batch_embedded = tf.nn.embedding_lookup(embeddings_var, batch_ph)
 
 # (Bi-)RNN layer(-s)
-with tf.name_scope('BiRNN_layer'):
-    rnn_outputs, _ = bi_rnn(GRUCell(HIDDEN_SIZE), GRUCell(HIDDEN_SIZE),
-                            inputs=batch_embedded, sequence_length=seq_len_ph, dtype=tf.float32)
-    # rnn_outputs, _ = rnn(GRUCell(hidden_size), inputs=batch_embedded, sequence_length=seq_len_ph, dtype=tf.float32)
+rnn_outputs, _ = bi_rnn(GRUCell(HIDDEN_SIZE), GRUCell(HIDDEN_SIZE),
+                        inputs=batch_embedded, sequence_length=seq_len_ph, dtype=tf.float32)
+# rnn_outputs, _ = rnn(GRUCell(hidden_size), inputs=batch_embedded, sequence_length=seq_len_ph, dtype=tf.float32)
 
 # Attention layer
 with tf.name_scope('Attention_layer'):
     attention_output, alphas = attention(rnn_outputs, ATTENTION_SIZE, return_alphas=True)
 
 # Dropout
-with tf.name_scope('Dropout'):
-    drop = tf.nn.dropout(attention_output, keep_prob_ph)
+drop = tf.nn.dropout(attention_output, keep_prob_ph)
     
 # Fully connected layer
 with tf.name_scope('Fully_connected_layer'):
