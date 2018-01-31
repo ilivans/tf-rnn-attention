@@ -20,11 +20,11 @@ alphas_values = alphas_test[0][0]
 
 # Build correct mapping from word to index and inverse
 word_index = imdb.get_word_index()
-word_index = {word:index + INDEX_FROM for word, index in word_index.items()}
+word_index = {word: index + INDEX_FROM for word, index in word_index.items()}
 word_index[":PAD:"] = 0
 word_index[":START:"] = 1
 word_index[":UNK:"] = 2
-index_word = {value:key for key,value in word_index.items()}
+index_word = {value: key for key, value in word_index.items()}
 # Represent the sample by words rather than indices
 words = list(map(index_word.get, x_batch_test[0]))
 
