@@ -9,7 +9,7 @@ from __future__ import print_function, division
 
 import numpy as np
 import tensorflow as tf
-from keras.datasets import imdb
+from tensorflow.python.keras.datasets import imdb
 from tensorflow.contrib.rnn import GRUCell
 from tensorflow.python.ops.rnn import bidirectional_dynamic_rnn as bi_rnn
 from tqdm import tqdm
