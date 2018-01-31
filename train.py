@@ -54,7 +54,7 @@ with tf.name_scope('Embedding_layer'):
 # (Bi-)RNN layer(-s)
 rnn_outputs, _ = bi_rnn(GRUCell(HIDDEN_SIZE), GRUCell(HIDDEN_SIZE),
                         inputs=batch_embedded, sequence_length=seq_len_ph, dtype=tf.float32)
-tf.summary.histogram('Rnn_outputs', rnn_outputs)
+tf.summary.histogram('RNN_outputs', rnn_outputs)
 
 # Attention layer
 with tf.name_scope('Attention_layer'):
