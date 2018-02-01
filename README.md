@@ -5,6 +5,7 @@ Inspired by "Hierarchical Attention Networks for Document Classification", Zicha
 - Python >= 2.6
 - Tensorflow >= 1.0
 - Keras (IMDB dataset)
+- tqdm
 
 To view visualization example visit http://htmlpreview.github.io/?https://github.com/ilivans/tf-rnn-attention/blob/master/visualization.html
 

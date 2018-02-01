@@ -6,11 +6,11 @@ Uses saved model, so it should be executed after train.py
 """
 from train import *
 
-saver = tf.train.import_meta_graph('model.meta')
+saver = tf.train.Saver()
 
 # Calculate alpha coefficients for the first test example
 with tf.Session() as sess:
-    saver.restore(sess, "model")
+    saver.restore(sess, MODEL_PATH)
 
     x_batch_test, y_batch_test = X_test[:1], y_test[:1]
     seq_len_test = np.array([list(x).index(0) + 1 for x in x_batch_test])
@@ -20,11 +20,11 @@ alphas_values = alphas_test[0][0]
 
 # Build correct mapping from word to index and inverse
 word_index = imdb.get_word_index()
-word_index = {word:index + INDEX_FROM for word, index in word_index.items()}
+word_index = {word: index + INDEX_FROM for word, index in word_index.items()}
 word_index[":PAD:"] = 0
 word_index[":START:"] = 1
 word_index[":UNK:"] = 2
-index_word = {value:key for key,value in word_index.items()}
+index_word = {value: key for key, value in word_index.items()}
 # Represent the sample by words rather than indices
 words = list(map(index_word.get, x_batch_test[0]))
 
@@ -36,3 +36,5 @@ with open("visualization.html", "w") as html_file:
         elif word == ":PAD:":
             break
         html_file.write('<font style="background: rgba(255, 255, 0, %f)">%s</font>\n' % (alpha, word))
+
+print('\nOpen visualization.html to checkout the attention coefficients visualization.')

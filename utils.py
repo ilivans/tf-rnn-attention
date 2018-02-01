@@ -1,4 +1,5 @@
 from __future__ import print_function
+
 import numpy as np
 
 
@@ -42,5 +43,5 @@ if __name__ == "__main__":
     # Test batch generator
     gen = batch_generator(np.array(['a', 'b', 'c', 'd']), np.array([1, 2, 3, 4]), 2)
     for _ in range(8):
-        xx, yy = gen.next()
+        xx, yy = next(gen)
         print(xx, yy)
