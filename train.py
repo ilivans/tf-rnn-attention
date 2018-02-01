@@ -82,10 +82,6 @@ with tf.name_scope('Metrics'):
     accuracy = tf.reduce_mean(tf.cast(tf.equal(tf.round(tf.sigmoid(y_hat)), target_ph), tf.float32))
     tf.summary.scalar('accuracy', accuracy)
 
-# Actual lengths of sequences
-seq_len_test = np.array([list(x).index(0) + 1 for x in X_test])
-seq_len_train = np.array([list(x).index(0) + 1 for x in X_train])
-
 merged = tf.summary.merge_all()
 
 # Batch generators
