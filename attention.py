@@ -69,7 +69,7 @@ def attention(inputs, attention_size, time_major=False, return_alphas=False):
 
     # For each of the timestamps its vector of size A from `v` is reduced with `u` vector
     vu = tf.tensordot(v, u_omega, axes=1, name='vu')  # (B,T) shape
-    alphas = tf.nn.softmax(vu, name='alphas')  # (B,T) shape also
+    alphas = tf.nn.softmax(vu, name='alphas')         # (B,T) shape
 
     # Output of (Bi-)RNN is reduced with attention vector; the result has (B,D) shape
     output = tf.reduce_sum(inputs * tf.expand_dims(alphas, -1), 1)
