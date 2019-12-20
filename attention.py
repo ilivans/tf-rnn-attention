@@ -57,10 +57,12 @@ def attention(inputs, attention_size, time_major=False, return_alphas=False):
 
     hidden_size = inputs.shape[2].value  # D value - hidden size of the RNN layer
 
+    initializer = tf.random_normal_initializer(stddev=0.1)
+
     # Trainable parameters
-    w_omega = tf.Variable(tf.random_normal([hidden_size, attention_size], stddev=0.1))
-    b_omega = tf.Variable(tf.random_normal([attention_size], stddev=0.1))
-    u_omega = tf.Variable(tf.random_normal([attention_size], stddev=0.1))
+    w_omega = tf.get_variable(name="w_omega", shape=[hidden_size, attention_size], initializer=initializer)
+    b_omega = tf.get_variable(name="b_omega", shape=[attention_size], initializer=initializer)
+    u_omega = tf.get_variable(name="u_omega", shape=[attention_size], initializer=initializer)
 
     with tf.name_scope('v'):
         # Applying fully connected layer with non-linear activation to each of the B*T timestamps;
